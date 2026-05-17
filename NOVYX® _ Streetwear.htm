@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NOVYX® | Streetwear</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    >
+
+    <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .logo-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .hero-bg {
+
+            background-image:
+                linear-gradient(rgba(0,0,0,0.82), rgba(0,0,0,0.92)),
+                url('1_Front.png');
+
+            background-size: cover;
+            background-position: center;
+
+        }
+
+        .toast-show {
+            animation: toastIn 0.3s ease;
+        }
+
+        @keyframes toastIn {
+
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body class="bg-black text-white">
+
+    <!-- TOAST -->
+    <div
+        id="toast"
+        class="hidden fixed bottom-6 right-6 bg-white text-black px-6 py-4 rounded-2xl font-semibold shadow-2xl z-[9999] toast-show">
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/10">
+
+        <div class="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
+
+            <div class="flex items-center gap-3">
+                <div class="w-7 h-7 bg-white rounded-xl flex items-center justify-center text-black font-bold text-xl logo-font">N</div>
+                <h1 class="text-3xl font-bold tracking-tighter logo-font">NOVYX</h1>
+            </div>
+
+            <div class="flex gap-8 text-sm font-medium">
+                <a href="#shop" class="hover:text-gray-400 transition">SHOP</a>
+                <button onclick="toggleAboutModal()" class="hover:text-gray-400 transition">ABOUT</button>
+            </div>
+
+            <div class="flex items-center gap-4">
+
+                <button
+                    id="admin-btn"
+                    onclick="toggleAdminPanel()"
+                    class="hidden bg-red-600 px-5 py-2 rounded-2xl font-semibold hover:bg-red-500 transition">
+                    ADMIN
+                </button>
+
+                <button
+                    id="auth-btn"
+                    onclick="handleAuthButton()"
+                    class="bg-white text-black px-5 py-2 rounded-2xl font-semibold hover:bg-gray-200 transition">
+                    LOGIN
+                </button>
+
+                <button onclick="toggleCart()" class="relative">
+                    <i class="fa-solid fa-bag-shopping text-2xl"></i>
+                    <span
+                        id="cart-count"
+                        class="absolute -top-1 -right-1 bg-white text-black text-xs w-5 h-5 rounded-full flex items-center justify-center font-medium">
+                        0
+                    </span>
+                </button>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero-bg h-screen flex items-center">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <h1 class="text-7xl md:text-8xl font-bold tracking-tighter logo-font mb-4">NOVYX</h1>
+            <p class="text-xl md:text-2xl text-gray-300 max-w-md mx-auto">Limited Streetwear</p>
+            <button
+                onclick="document.getElementById('shop').scrollIntoView({behavior: 'smooth'})"
+                class="mt-10 bg-white text-black px-10 py-5 rounded-2xl font-semibold hover:bg-gray-200 transition">
+                JETZT ENTDECKEN
+            </button>
+        </div>
+    </section>
+
+    <!-- SHOP -->
+    <section id="shop" class="py-20 bg-zinc-950">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-5xl font-bold text-center mb-16 tracking-tight">Unsere Designs</h2>
+            <div id="product-grid" class="grid md:grid-cols-3 gap-12"></div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-black py-16 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-gray-500">© 2026 NOVYX STUDIO • Limited Streetwear</p>
+        </div>
+    </footer>
+
+    <!-- ABOUT MODAL -->
+    <div id="about-modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+        <div class="bg-zinc-900 max-w-2xl w-full mx-4 rounded-3xl p-10 relative">
+            <button onclick="toggleAboutModal()" class="absolute top-5 right-6 text-4xl">×</button>
+            <h2 class="text-5xl font-bold logo-font mb-6">ABOUT NOVYX</h2>
+            <p class="text-gray-300 text-lg leading-8">
+                NOVYX steht für moderne Streetwear mit futuristischen Prints,
+                dunkler Ästhetik und limitierten Drops.
+            </p>
+        </div>
+    </div>
+
+    <!-- AUTH MODAL -->
+    <div id="auth-modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+        <div class="bg-zinc-900 max-w-md w-full mx-4 rounded-3xl p-8">
+
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-3xl font-semibold">Konto</h3>
+                <button onclick="closeAuthModal()" class="text-4xl">×</button>
+            </div>
+
+            <input type="text" id="username" placeholder="Username"
+                class="w-full mb-4 bg-zinc-800 p-4 rounded-2xl outline-none">
+
+            <input type="password" id="password" placeholder="Passwort"
+                class="w-full mb-6 bg-zinc-800 p-4 rounded-2xl outline-none">
+
+            <button onclick="register()"
+                class="w-full bg-white text-black py-4 rounded-2xl font-semibold mb-4">
+                REGISTRIEREN
+            </button>
+
+            <button onclick="login()"
+                class="w-full border border-white/20 py-4 rounded-2xl font-semibold">
+                ANMELDEN
+            </button>
+
+        </div>
+    </div>
+
+    <!-- CART MODAL -->
+    <div id="cart-modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+        <div class="bg-zinc-900 w-full max-w-lg mx-4 rounded-3xl p-8 max-h-[90vh] overflow-y-auto">
+
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-3xl font-semibold">Warenkorb</h3>
+                <button onclick="toggleCart()" class="text-4xl">×</button>
+            </div>
+
+            <div id="cart-items"></div>
+
+            <div class="mt-8 pt-6 border-t border-white/10">
+                <div class="flex justify-between text-xl mb-6">
+                    <span>Gesamt</span>
+                    <span id="cart-total">0,00 €</span>
+                </div>
+                <button onclick="openCheckout()"
+                    class="w-full bg-white text-black py-5 rounded-2xl font-semibold">
+                    BESTELLUNG FORTSETZEN
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CHECKOUT MODAL -->
+    <div id="checkout-modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+        <div class="bg-zinc-900 w-full max-w-2xl mx-4 rounded-3xl p-8 max-h-[90vh] overflow-y-auto">
+
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-4xl font-bold">Bestellung abschließen</h2>
+                <button onclick="closeCheckout()" class="text-4xl">×</button>
+            </div>
+
+            <div class="space-y-5">
+                <input type="text" id="checkout-name" placeholder="Vollständiger Name"
+                    class="w-full bg-zinc-800 p-4 rounded-2xl outline-none">
+                <input type="text" id="checkout-address" placeholder="Adresse"
+                    class="w-full bg-zinc-800 p-4 rounded-2xl outline-none">
+                <div class="grid md:grid-cols-2 gap-5">
+                    <input type="text" id="checkout-state" placeholder="Bundesland"
+                        class="w-full bg-zinc-800 p-4 rounded-2xl outline-none">
+                    <input type="text" id="checkout-zip" placeholder="Postleitzahl"
+                        class="w-full bg-zinc-800 p-4 rounded-2xl outline-none">
+                </div>
+                <input type="email" id="checkout-email" placeholder="E-Mail Adresse"
+                    class="w-full bg-zinc-800 p-4 rounded-2xl outline-none">
+            </div>
+
+            <div class="mt-8 bg-zinc-800 border border-white/10 rounded-3xl p-6">
+                <div class="flex gap-4 items-start">
+                    <i class="fa-solid fa-circle-info text-blue-400 text-xl mt-1"></i>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">Hinweis zur Bestellung</h3>
+                        <p class="text-gray-400 leading-7">
+                            Deine Bestellung muss zuerst vom NOVYX Team bestätigt werden,
+                            bevor sie bezahlt oder versendet werden kann.
+                            Die Bearbeitung kann bis zu 72 Stunden dauern.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="confirmOrder()"
+                class="w-full mt-8 bg-white text-black py-5 rounded-2xl font-semibold">
+                BESTELLUNG BESTÄTIGEN
+            </button>
+
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div id="admin-panel" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+        <div class="bg-zinc-900 w-full max-w-7xl mx-4 rounded-3xl p-8 max-h-[90vh] overflow-y-auto">
+
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-4xl font-bold">Admin Dashboard</h2>
+                <button onclick="toggleAdminPanel()" class="text-4xl">×</button>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">Benutzer</h3>
+                    <div id="admin-users" class="space-y-5"></div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">Produkte</h3>
+                    <div id="admin-products" class="space-y-5"></div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">Bestellungen</h3>
+                    <div id="admin-orders" class="space-y-5"></div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+
+        // ─── TOAST ───────────────────────────────────────────────────────────
+        function showToast(message) {
+            const toast = document.getElementById("toast")
+            toast.textContent = message
+            toast.classList.remove("hidden")
+            clearTimeout(window.toastTimeout)
+            window.toastTimeout = setTimeout(() => toast.classList.add("hidden"), 2500)
+        }
+
+
+        // ─── PRODUCTS ────────────────────────────────────────────────────────
+        let products = [
+            {
+                id: 1, name: "EXCEPTION", color: "Black",
+                price: 60, discount: 0,
+                front: "1_Front2.png", back: "1_Back2.png",
+                desc: "Minimal Front • Großer abstrakter Backprint"
+            },
+            {
+                id: 2, name: "WORLD IS YOURS", color: "Washed Black",
+                price: 60, discount: 0,
+                front: "2_Front2.png", back: "2_Back2.png",
+                desc: "Globe Graphic • Premium Washed Look"
+            },
+            {
+                id: 3, name: "LEGACY", color: "Sand",
+                price: 55, discount: 0,
+                front: "3_Front2.png", back: "3_Back2.png",
+                desc: "Est. 2024 • Architektur Backprint"
+            }
+        ]
+
+        const savedProducts = localStorage.getItem("novyxProducts")
+        if (savedProducts) products = JSON.parse(savedProducts)
+
+        function saveProducts() {
+            localStorage.setItem("novyxProducts", JSON.stringify(products))
+        }
+
+
+        // ─── STATE ───────────────────────────────────────────────────────────
+        let currentUser = localStorage.getItem("novyxUser")
+        let cart = []
+        let onlineUsers = JSON.parse(localStorage.getItem("novyxOnlineUsers")) || []
+
+
+        // ─── ABOUT ───────────────────────────────────────────────────────────
+        function toggleAboutModal() {
+            document.getElementById("about-modal").classList.toggle("hidden")
+        }
+
+
+        // ─── AUTH ────────────────────────────────────────────────────────────
+        function openAuthModal()  { document.getElementById("auth-modal").classList.remove("hidden") }
+        function closeAuthModal() { document.getElementById("auth-modal").classList.add("hidden") }
+
+        function updateAuthButton() {
+            document.getElementById("auth-btn").textContent = currentUser ? "LOGOUT" : "LOGIN"
+            const adminBtn = document.getElementById("admin-btn")
+            currentUser === "Novyx"
+                ? adminBtn.classList.remove("hidden")
+                : adminBtn.classList.add("hidden")
+        }
+
+        function handleAuthButton() {
+            currentUser ? logout() : openAuthModal()
+        }
+
+        function register() {
+            const username = document.getElementById("username").value.trim()
+            const password = document.getElementById("password").value
+            if (!username || !password) { showToast("Bitte alles ausfüllen"); return }
+
+            let users = JSON.parse(localStorage.getItem("novyxUsers")) || []
+            if (users.find(u => u.username === username)) { showToast("Username vergeben"); return }
+
+            users.push({ username, password, personalDiscount: 0 })
+            localStorage.setItem("novyxUsers", JSON.stringify(users))
+
+            currentUser = username
+            localStorage.setItem("novyxUser", username)
+            onlineUsers.push(username)
+            localStorage.setItem("novyxOnlineUsers", JSON.stringify(onlineUsers))
+
+            updateAuthButton()
+            closeAuthModal()
+            renderProducts()
+            showToast("Registrierung erfolgreich")
+        }
+
+        function login() {
+            const username = document.getElementById("username").value.trim()
+            const password = document.getElementById("password").value
+
+            let users = JSON.parse(localStorage.getItem("novyxUsers")) || []
+            const user = users.find(u => u.username === username && u.password === password)
+            if (!user) { showToast("Falsche Login-Daten"); return }
+
+            currentUser = username
+            localStorage.setItem("novyxUser", username)
+            if (!onlineUsers.includes(username)) onlineUsers.push(username)
+            localStorage.setItem("novyxOnlineUsers", JSON.stringify(onlineUsers))
+
+            cart = JSON.parse(localStorage.getItem("cart_" + currentUser)) || []
+            document.getElementById("cart-count").textContent = cart.length
+
+            updateAuthButton()
+            renderProducts()
+            closeAuthModal()
+            showToast("Willkommen " + username)
+        }
+
+        function logout() {
+            onlineUsers = onlineUsers.filter(u => u !== currentUser)
+            localStorage.setItem("novyxOnlineUsers", JSON.stringify(onlineUsers))
+            currentUser = null
+            cart = []
+            document.getElementById("cart-count").textContent = 0
+            localStorage.removeItem("novyxUser")
+            updateAuthButton()
+            renderProducts()
+            showToast("Ausgeloggt")
+        }
+
+
+        // ─── RENDER PRODUCTS ─────────────────────────────────────────────────
+        function renderProducts() {
+            const grid = document.getElementById("product-grid")
+            grid.innerHTML = ""
+
+            let users = JSON.parse(localStorage.getItem("novyxUsers")) || []
+            let user = users.find(u => u.username === currentUser)
+            let personalDiscount = user ? user.personalDiscount : 0
+
+            products.forEach(product => {
+                let finalPrice = product.price
+                finalPrice -= finalPrice * product.discount / 100
+                finalPrice -= finalPrice * personalDiscount / 100
+
+                grid.innerHTML += `
+                    <div class="group">
+
+                        <div class="relative overflow-hidden rounded-3xl bg-zinc-900 aspect-square mb-6">
+                            <img src="${product.front}"
+                                class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 opacity-100 group-hover:opacity-0">
+                            <img src="${product.back}"
+                                class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 opacity-0 group-hover:opacity-100">
+                            ${product.discount > 0 ? `
+                                <div class="absolute top-4 left-4 bg-red-600 px-4 py-2 rounded-2xl text-xs font-bold">
+                                    -${product.discount}%
+                                </div>` : ""}
+                        </div>
+
+                        <h3 class="text-2xl font-bold">${product.name}</h3>
+                        <p class="text-gray-400 text-sm mt-1">${product.desc}</p>
+
+                        <div class="mt-3">
+                            ${product.discount > 0 || personalDiscount > 0 ? `
+                                <p class="text-gray-500 line-through">${product.price.toFixed(2)} €</p>
+                                <p class="text-2xl font-bold text-red-500">${finalPrice.toFixed(2)} €</p>
+                            ` : `
+                                <p class="text-xl font-semibold">${product.price.toFixed(2)} €</p>
+                            `}
+                        </div>
+
+                        <button onclick="addToCart(${product.id})"
+                            class="mt-6 w-full bg-white text-black py-4 rounded-2xl font-medium">
+                            IN DEN WARENKORB
+                        </button>
+
+                    </div>
+                `
+            })
+        }
+
+
+        // ─── CART ────────────────────────────────────────────────────────────
+        function addToCart(id) {
+            if (!currentUser) { showToast("Bitte zuerst anmelden"); return }
+            const product = products.find(p => p.id === id)
+            cart.push(product)
+            localStorage.setItem("cart_" + currentUser, JSON.stringify(cart))
+            document.getElementById("cart-count").textContent = cart.length
+            showToast(product.name + " hinzugefügt")
+        }
+
+        function removeFromCart(index) {
+            const removed = cart[index]
+            cart.splice(index, 1)
+            localStorage.setItem("cart_" + currentUser, JSON.stringify(cart))
+            document.getElementById("cart-count").textContent = cart.length
+            renderCart()
+            showToast(removed.name + " entfernt")
+        }
+
+        function toggleCart() {
+            document.getElementById("cart-modal").classList.toggle("hidden")
+            renderCart()
+        }
+
+        function renderCart() {
+            const container = document.getElementById("cart-items")
+            container.innerHTML = ""
+            let total = 0
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-10">
+                        Dein Warenkorb ist leer
+                    </div>`
+            }
+
+            cart.forEach((item, index) => {
+                total += item.price
+                container.innerHTML += `
+                    <div class="bg-zinc-800 p-4 rounded-2xl mb-4">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-bold">${item.name}</h3>
+                                <p class="text-gray-400 text-sm">${item.color}</p>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <p class="font-semibold">${item.price.toFixed(2)} €</p>
+                                <button
+                                    onclick="removeFromCart(${index})"
+                                    class="w-8 h-8 flex items-center justify-center rounded-xl bg-zinc-700 hover:bg-red-600 text-gray-400 hover:text-white transition text-xl leading-none">
+                                    ×
+                                </button>
+                            </div>
+                        </div>
+                    </div>`
+            })
+
+            document.getElementById("cart-total").textContent = total.toFixed(2) + " €"
+        }
+
+
+        // ─── CHECKOUT ────────────────────────────────────────────────────────
+        function openCheckout() {
+            if (cart.length === 0) { showToast("Warenkorb ist leer"); return }
+            document.getElementById("checkout-modal").classList.remove("hidden")
+        }
+
+        function closeCheckout() {
+            document.getElementById("checkout-modal").classList.add("hidden")
+        }
+
+        function confirmOrder() {
+            const name    = document.getElementById("checkout-name").value.trim()
+            const address = document.getElementById("checkout-address").value.trim()
+            const state   = document.getElementById("checkout-state").value.trim()
+            const zip     = document.getElementById("checkout-zip").value.trim()
+            const email   = document.getElementById("checkout-email").value.trim()
+
+            if (!name || !address || !state || !zip || !email) {
+                showToast("Bitte alle Felder ausfüllen")
+                return
+            }
+
+            let orders = JSON.parse(localStorage.getItem("novyxOrders")) || []
+            orders.push({ user: currentUser, name, address, state, zip, email, items: cart, date: new Date().toLocaleString() })
+            localStorage.setItem("novyxOrders", JSON.stringify(orders))
+
+            showToast("Bestellung erfolgreich gesendet")
+
+            cart = []
+            localStorage.setItem("cart_" + currentUser, JSON.stringify(cart))
+            document.getElementById("cart-count").textContent = 0
+
+            renderCart()
+            closeCheckout()
+            toggleCart()
+        }
+
+
+        // ─── ADMIN ───────────────────────────────────────────────────────────
+        function toggleAdminPanel() {
+            document.getElementById("admin-panel").classList.toggle("hidden")
+            renderAdminProducts()
+            renderAdminUsers()
+            renderOrders()
+        }
+
+        // RENDER USERS
+        function renderAdminUsers() {
+            const container = document.getElementById("admin-users")
+            container.innerHTML = ""
+
+            let users = JSON.parse(localStorage.getItem("novyxUsers")) || []
+
+            if (users.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-zinc-800 p-5 rounded-3xl text-gray-400">
+                        Keine Benutzer vorhanden
+                    </div>`
+                return
+            }
+
+            users.forEach(user => {
+                const online = onlineUsers.includes(user.username)
+                container.innerHTML += `
+                    <div class="bg-zinc-800 p-5 rounded-3xl">
+
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold">${user.username}</h3>
+                                <p class="text-gray-400">Rabatt: ${user.personalDiscount || 0}%</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full ${online ? 'bg-green-500' : 'bg-red-500'}"></div>
+                                    <span class="text-sm">${online ? 'Online' : 'Offline'}</span>
+                                </div>
+                                <button
+                                    onclick="deleteUser('${user.username}')"
+                                    class="w-8 h-8 flex items-center justify-center rounded-xl bg-zinc-700 hover:bg-red-600 text-gray-400 hover:text-white transition"
+                                    title="Benutzer löschen">
+                                    <i class="fa-solid fa-trash text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <input
+                                type="number"
+                                id="discount-${user.username}"
+                                value="${user.personalDiscount || 0}"
+                                class="flex-1 bg-zinc-700 p-3 rounded-2xl outline-none"
+                            >
+                            <button
+                                onclick="saveUserDiscount('${user.username}')"
+                                class="bg-blue-600 px-4 rounded-2xl hover:bg-blue-500 transition">
+                                Save
+                            </button>
+                        </div>
+
+                    </div>`
+            })
+        }
+
+        // DELETE USER
+        function deleteUser(username) {
+            if (!confirm(`Benutzer "${username}" wirklich löschen?`)) return
+
+            let users = JSON.parse(localStorage.getItem("novyxUsers")) || []
+            users = users.filter(u => u.username !== username)
+            localStorage.setItem("novyxUsers", JSON.stringify(users))
+
+            localStorage.removeItem("cart_" + username)
+
+            onlineUsers = onlineUsers.filter(u => u !== username)
+            localStorage.setItem("novyxOnlineUsers", JSON.stringify(onlineUsers))
+
+            renderAdminUsers()
+            showToast(`${username} gelöscht`)
+        }
+
+        // SAVE USER DISCOUNT
+        function saveUserDiscount(username) {
+            let users = JSON.parse(localStorage.getItem("novyxUsers")) || []
+            let user = users.find(u => u.username === username)
+            if (!user) return
+
+            user.personalDiscount = parseInt(document.getElementById(`discount-${username}`).value)
+            localStorage.setItem("novyxUsers", JSON.stringify(users))
+
+            renderProducts()
+            showToast("Rabatt gespeichert")
+        }
+
+        // RENDER PRODUCTS (ADMIN)
+        function renderAdminProducts() {
+            const container = document.getElementById("admin-products")
+            container.innerHTML = ""
+
+            products.forEach(product => {
+                container.innerHTML += `
+                    <div class="bg-zinc-800 p-5 rounded-3xl">
+                        <h3 class="text-xl font-bold mb-4">${product.name}</h3>
+                        <input
+                            type="number"
+                            id="price-${product.id}"
+                            value="${product.price}"
+                            class="w-full bg-zinc-700 p-3 rounded-2xl outline-none mb-3"
+                        >
+                        <input
+                            type="number"
+                            id="discount-product-${product.id}"
+                            value="${product.discount}"
+                            class="w-full bg-zinc-700 p-3 rounded-2xl outline-none mb-3"
+                        >
+                        <button
+                            onclick="saveProduct(${product.id})"
+                            class="w-full bg-red-600 py-3 rounded-2xl font-semibold hover:bg-red-500 transition">
+                            SPEICHERN
+                        </button>
+                    </div>`
+            })
+        }
+
+        // SAVE PRODUCT
+        function saveProduct(id) {
+            const product = products.find(p => p.id === id)
+            product.price    = parseFloat(document.getElementById(`price-${id}`).value)
+            product.discount = parseInt(document.getElementById(`discount-product-${id}`).value)
+            saveProducts()
+            renderProducts()
+            showToast("Produkt gespeichert")
+        }
+
+        // RENDER ORDERS
+        function renderOrders() {
+            const container = document.getElementById("admin-orders")
+            container.innerHTML = ""
+
+            const orders = JSON.parse(localStorage.getItem("novyxOrders")) || []
+
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-zinc-800 p-5 rounded-3xl text-gray-400">
+                        Keine Bestellungen vorhanden
+                    </div>`
+                return
+            }
+
+            const reversed = [...orders].reverse()
+
+            reversed.forEach((order, index) => {
+                const realIndex = orders.length - 1 - index
+
+                container.innerHTML += `
+                    <div class="bg-zinc-800 p-5 rounded-3xl">
+
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold">${order.user}</h3>
+                            <button
+                                onclick="deleteOrder(${realIndex})"
+                                class="w-8 h-8 flex items-center justify-center rounded-xl bg-zinc-700 hover:bg-red-600 text-gray-400 hover:text-white transition"
+                                title="Bestellung löschen">
+                                <i class="fa-solid fa-trash text-xs"></i>
+                            </button>
+                        </div>
+
+                        <div class="space-y-2 text-sm text-gray-300">
+                            <p><b>Name:</b> ${order.name}</p>
+                            <p><b>Adresse:</b> ${order.address}</p>
+                            <p><b>Bundesland:</b> ${order.state}</p>
+                            <p><b>PLZ:</b> ${order.zip}</p>
+                            <p><b>Email:</b> ${order.email}</p>
+                            <p><b>Datum:</b> ${order.date}</p>
+                        </div>
+
+                        <div class="mt-5">
+                            <h4 class="font-bold mb-3">Produkte</h4>
+                            ${order.items.map(item => `
+                                <div class="bg-zinc-700 p-3 rounded-2xl mb-2">
+                                    ${item.name} • ${item.price.toFixed(2)} €
+                                </div>`).join("")}
+                        </div>
+
+                    </div>`
+            })
+        }
+
+        // DELETE ORDER
+        function deleteOrder(index) {
+            if (!confirm("Bestellung wirklich löschen?")) return
+
+            let orders = JSON.parse(localStorage.getItem("novyxOrders")) || []
+            orders.splice(index, 1)
+            localStorage.setItem("novyxOrders", JSON.stringify(orders))
+
+            renderOrders()
+            showToast("Bestellung gelöscht")
+        }
+
+
+        // ─── START ───────────────────────────────────────────────────────────
+        window.onload = () => {
+            renderProducts()
+            updateAuthButton()
+            if (currentUser) {
+                cart = JSON.parse(localStorage.getItem("cart_" + currentUser)) || []
+                document.getElementById("cart-count").textContent = cart.length
+            }
+        }
+
+    </script>
+
+</body>
+</html>
